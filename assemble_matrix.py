@@ -1,6 +1,8 @@
 # Ross Maguire
 # Functions to build and assemble the local and global mass and stiffness matrices
 
+import numpy as np
+
 def build_local_mass_matrix(grid):
 
     ''' Function to build a mass matrix for each element.
@@ -8,7 +10,6 @@ def build_local_mass_matrix(grid):
         diagonal. The function returns an array with the 
         diagonals of of the mass matrix for each element. '''
 
-    import numpy as np
     M_local = np.zeros(((grid.n_elem),(grid.lpd+1)))
 
     for e in range(0, grid.n_elem):
@@ -24,16 +25,15 @@ def build_local_mass_matrix(grid):
     return M_local
     
 def build_global_mass_matrix(grid,local_mass_matrix):
-    import numpy as np
-    M_global = np.zeros(grid.n_global_nodes-1)
+    M_global = np.zeros(grid.n_global_nodes)
     count = 0
     for i in range(0, grid.n_elem):
-        M_global[count:count+4] += local_mass_matrix[count,:]
-        count += 4
+         M_global[count:count+grid.lpd+1] += local_mass_matrix[i,:]
+         count += grid.lpd
+
     return M_global
 
 def build_local_stiffness_matrix(grid):      
-    import numpy as np
     K_local = np.zeros(((grid.n_elem),(grid.lpd+1),(grid.lpd+1)))
 
     for e in range(0, grid.n_elem):
@@ -50,5 +50,3 @@ def build_local_stiffness_matrix(grid):
                                  grid.dxi_dx[e,i]**2 * grid.dx_dxi[e,i] )
 
     return K_local 
-
-
